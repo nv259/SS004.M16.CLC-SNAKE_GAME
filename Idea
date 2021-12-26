@@ -1,0 +1,9 @@
+//===========================================
+GÓC Ý TƯỞNG:
+1. X to pause.
+2. Cứ mỗi 5 fruit ăn được thì sẽ được bonus 1 big fruit (x10 điểm -> Giảm dần theo thời gian).
+3. Được quyền chọn Game_level (1-2-3-4-5 tương ứng với số điểm nhận được khi ăn một fruit, số điểm kiến nghị: 5-10-15-20-25).
+4. Một vài portal cho phép dịch chuyển đến một portal khác.
+5. Tích đủ điểm cho phép (tiêu điểm) sử dụng kỹ năng (vd: unvulnerable cho phép đi xuyên cơ thể trong vòng 3 4 bước ....)
+6. Bảng high_score lưu lại top 5 người chơi.
+============================================//
