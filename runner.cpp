@@ -1,4 +1,4 @@
-// OTS : of the snake 
+// OTS : of the snake
 #include    <iostream>
 #include    <windows.h>
 #include    <conio.h>
@@ -13,7 +13,7 @@ void gotoxy(int column, int line)
 	coord.X = column;
 	coord.Y = line;
 	SetConsoleCursorPosition(
-		GetStdHandle(STD_OUTPUT_HANDLE),
+		GetStdHandle( STD_OUTPUT_HANDLE ),
 		coord
 		);
 }
@@ -35,7 +35,7 @@ class SNAKE {
 public:
     int snake_length;
     Point snake[100];
-    
+
     void move(char direct) {
         /* move the head */
         snake[0].pre_x = snake[0].x;
@@ -67,23 +67,20 @@ public:
 
     void init() {
         snake_length = 3;
-        snake[0].x = 3;
-		snake[0].y = 1;
-		snake[1].x = 2;
-		snake[1].y = 1;
-		snake[2].x = 1;
-		snake[2].y = 1;
+        snake[0].x = 10;
+		snake[0].y = 10;
+		snake[1].x = 11;
+		snake[1].y = 10;
+		snake[2].x = 12;
+		snake[2].y = 10;
     }
 
     void draw() {
-        /* draw the head */
-        gotoxy(snake[0].x, snake[0].y);
-        cout << "H";
-
-        for (int i = 1; i < snake_length; i++)
+        for (int i = 0; i < snake_length; i++)
         {
             gotoxy(snake[i].x, snake[i].y);
-            cout << "P";    
+            if (i == 0) cout << "H";
+            else cout << "P";
         }
     }
 };
@@ -91,7 +88,7 @@ public:
 class FOOD {
 public:
     int x, y;
-    
+
     void make_food() {
         x = rand() % 30; // 0 -> 29
         y = rand() % 20; // 0 -> 19
@@ -100,7 +97,7 @@ public:
     bool isAble(SNAKE s) {
         /* fruit can't be on the edges of the board */
         if (x == 0 || x == 30 || y == 0 || y == 20) return false;
-        
+
         /* fruit can't be in the snake */
         for (int i = 0; i < s.snake_length; i++)
             if (s.snake[i].x == x && s.snake[i].y == y) return false;
@@ -125,14 +122,14 @@ class BOARD {
 public:
     void    draw() {
         gotoxy(1, 0);
-        for (int i = 1; i < 31; i++) 
+        for (int i = 1; i < 31; i++)
             cout << "-";
         cout << '\n';
         for (int row = 1; row < 21; row++)
         {
-            for (int col = 1; col < 21; col++)
+            for (int col = 1; col < 33; col++)
             {
-                if (col == 1 || col == 20) cout << "|";
+                if (col == 1 || col == 32) cout << "|";
                 else cout << " ";
             }
             cout << '\n';
@@ -142,7 +139,7 @@ public:
             cout << "-";
         cout << "\n\n\t     ";
         cout << "SCORE: " << player_score;
-    }
+     }
 };
 
 bool Game_over(SNAKE s) {
@@ -152,7 +149,7 @@ bool Game_over(SNAKE s) {
     /* snake bite itself */
     for (int i = 1; i < s.snake_length; i++)
         if (s.snake[0].x == s.snake[i].x && s.snake[0].y == s.snake[i].y) return true;
-    
+
     return false;
 }
 
@@ -163,7 +160,7 @@ void eat_food(SNAKE &s, FOOD& fruit) {
         s.snake_length++;
         fruit.init(s);
         //==================================
-        player_score += 10; 
+        player_score += 10;
     }
 }
 
@@ -175,33 +172,45 @@ bool able_to_move(char direct, char pre_direct) {
     return false;
 }
 
-const string available_key = "ASDW";
+const string available_key = "xasdw";
+
+SNAKE snake;
+FOOD fruit;
+BOARD board;
 
 int main() {
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
-    srand(time(NULL));
-    
+    // ios_base::sync_with_stdio(false);
+    // cin.tie(NULL);
+    // srand(time(NULL));
+
     /* variables */
-    SNAKE snake;    
-    FOOD fruit;
-    BOARD board;
-    char direct = 'd', pre_direct;
+
+    char direct = 'x', pre_direct = 'a';
 
     snake.init();
     fruit.init(snake);
-    
-    while (!Game_over(snake)) 
+
+    while (!Game_over(snake))
     {
-        if (_kbhit()) 
+        if (kbhit())
         {
             pre_direct = direct;
             direct = _getch();
             if (!available_key.find(direct)) direct = pre_direct;
             if (!able_to_move(direct, pre_direct)) direct = pre_direct;
         }
-
         system("cls");
+
+        if (direct == 'x')
+        {
+            board.draw();
+            snake.draw();
+            fruit.draw();
+            Sleep(200);
+            continue;
+
+        }
+
         board.draw();
         snake.move(direct);
         snake.draw();
