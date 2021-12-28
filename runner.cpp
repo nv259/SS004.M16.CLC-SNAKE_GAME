@@ -1,13 +1,13 @@
 // OTS : of the snake
-#include    <iostream>
-#include    <windows.h>
-#include	<stdexcept>
-#include    <conio.h>
-#include    <cstdlib>
-#include	<random>
-#include    <ctime>
+#include <iostream>
+#include <windows.h>
+#include <stdexcept>
+#include <conio.h>
+#include <cstdlib>
+#include <random>
+#include <ctime>
 
-void gotoxy(int column, int line)
+void gotoXY(int column, int line)
 {
 	COORD coord{};
 	coord.X = column;
@@ -18,7 +18,8 @@ void gotoxy(int column, int line)
 	);
 }
 
-struct  Point {
+struct Point
+{
 	int x, y;
 	// using pre_x, pre_y to store pre position of this point
 	// so that it is easier to update next point OTS
@@ -31,16 +32,19 @@ struct High_score
 	char user_name[30];
 };
 
-class SNAKE {
+class SNAKE
+{
 public:
 	int snake_length;
 	Point snake[100];
 
-	void move(char direct) {
-		/* move the head */
+	void move(char direct)
+	{
+		/*move the head*/
 		snake[0].pre_x = snake[0].x;
 		snake[0].pre_y = snake[0].y;
-		switch (direct) {
+		switch (direct)
+		{
 		case 'a':
 			snake[0].x--;
 			break;
@@ -55,7 +59,7 @@ public:
 			break;
 		}
 
-		/* move the part */
+		/*move the part*/
 		for (int i = 1; i < snake_length; i++)
 		{
 			snake[i].pre_x = snake[i].x;
@@ -65,7 +69,8 @@ public:
 		}
 	}
 
-	void init() {
+	void init()
+	{
 		snake_length = 3;
 		snake[0].x = 14;
 		snake[0].y = 10;
@@ -75,21 +80,24 @@ public:
 		snake[2].y = 10;
 	}
 
-	void draw() {
+	void draw()
+	{
 		for (int i = 0; i < snake_length; i++)
 		{
-			gotoxy(snake[i].x, snake[i].y);
+			gotoXY(snake[i].x, snake[i].y);
 			if (i == 0) std::cout << 'O';
 			else std::cout << 'o';
 		}
 	}
 };
 
-class FOOD {
+class FOOD
+{
 public:
 	int x, y;
 
-	void make_food() {
+	void make_food()
+	{
 		std::random_device seed;
 		std::mt19937 gen(seed());
 		std::uniform_int_distribution<int> distX(0, 29);
@@ -99,36 +107,41 @@ public:
 		y = distY(gen);
 	}
 
-	bool isAble(SNAKE s) {
-		/* fruit can't be on the edges of the board */
+	bool isAble(SNAKE s)
+	{
+		/*fruit can't be on the edges of the board*/
 		if (x == 0 || x == 30 || y == 0 || y == 20) return false;
 
-		/* fruit can't be in the snake */
+		/*fruit can't be in the snake*/
 		for (int i = 0; i < s.snake_length; i++)
 			if (s.snake[i].x == x && s.snake[i].y == y) return false;
 		return true;
 	}
 
-	void init(SNAKE s) {
+	void init(SNAKE s)
+	{
 		do {
 			make_food();
 		} while (!isAble(s));
 	}
 
-	void draw() {
-		gotoxy(x, y);
+	void draw()
+	{
+		gotoXY(x, y);
 		std::cout << (char)254;
-		gotoxy(0, 23);
+		gotoXY(0, 23);
 	}
 };
 
 int player_score;
 
-class BOARD {
+class BOARD
+{
 public:
-	void    draw() {
+	void draw()
+	{
 		std::cout << (char)218;
-		gotoxy(1, 0);
+		gotoXY(1, 0);
 		for (int i = 1; i < 31; i++)
 			std::cout << (char)196;
 		std::cout << (char)191 << '\n';
@@ -139,8 +152,10 @@ public:
 				if (col == 1 || col == 32) std::cout << (char)179;
 				else std::cout << " ";
 			}
+
 			std::cout << '\n';
 		}
+
 		std::cout << (char)192;
 		for (int i = 1; i < 31; i++)
 			std::cout << (char)196;
@@ -148,15 +163,16 @@ public:
 	}
 };
 
-bool Game_over(SNAKE s, std::string& reason) {
-	/* snake hit the wall */
+bool Game_over(SNAKE s, std::string& reason)
+{
+	/*snake hit the wall*/
 	if (s.snake[0].x > 30 || s.snake[0].x < 1 || s.snake[0].y > 20 || s.snake[0].y < 1)
 	{
 		reason = "You hit the wall! Game over!";
 		return true;
 	}
 
-	/* snake bite itself */
+	/*snake bite itself*/
 	for (int i = 1; i < s.snake_length; i++)
 		if (s.snake[0].x == s.snake[i].x && s.snake[0].y == s.snake[i].y)
 		{
@@ -167,8 +183,10 @@ bool Game_over(SNAKE s, std::string& reason) {
 	return false;
 }
 
-void eat_food(SNAKE& s, FOOD& fruit) {
-	if (s.snake[0].x == fruit.x && s.snake[0].y == fruit.y) {
+void eat_food(SNAKE& s, FOOD& fruit)
+{
+	if (s.snake[0].x == fruit.x && s.snake[0].y == fruit.y)
+	{
 		s.snake[s.snake_length].x = s.snake[s.snake_length - 1].x;
 		s.snake[s.snake_length].y = s.snake[s.snake_length - 1].y;
 		s.snake_length++;
@@ -177,11 +195,12 @@ void eat_food(SNAKE& s, FOOD& fruit) {
 	}
 }
 
-bool able_to_move(char direct, char pre_direct) {
-	if (direct == 'a' && pre_direct != 'd'
-		|| direct == 'd' && pre_direct != 'a'
-		|| direct == 's' && pre_direct != 'w'
-		|| direct == 'w' && pre_direct != 's') return true;
+bool able_to_move(char direct, char pre_direct)
+{
+	if (direct == 'a' && pre_direct != 'd' ||
+		direct == 'd' && pre_direct != 'a' ||
+		direct == 's' && pre_direct != 'w' ||
+		direct == 'w' && pre_direct != 's') return true;
 	return false;
 }
 
@@ -191,12 +210,13 @@ SNAKE snake;
 FOOD fruit;
 BOARD board;
 
-int main() {
+int main()
+{
 	// ios_base::sync_with_stdio(false);
 	// cin.tie(NULL);
 	// srand(time(NULL));
 
-	/* variables */
+	// variables
 
 	SetConsoleCP(437);
 	SetConsoleOutputCP(437);
@@ -217,6 +237,7 @@ int main() {
 			if (!available_key.find(direct)) direct = pre_direct;
 			if (!able_to_move(direct, pre_direct)) direct = pre_direct;
 		}
+
 		system("cls");
 
 		if (direct == 'x')
@@ -224,7 +245,7 @@ int main() {
 			board.draw();
 			snake.draw();
 			fruit.draw();
-			Sleep(100);
+			Sleep(70);
 			continue;
 		}
 
@@ -233,9 +254,10 @@ int main() {
 		snake.draw();
 		eat_food(snake, fruit);
 		fruit.draw();
-		Sleep(100);
+		Sleep(70);
 	}
-	gotoxy(0, 25);
+
+	gotoXY(0, 25);
 	std::cout << reason;
 
 	return 0;
