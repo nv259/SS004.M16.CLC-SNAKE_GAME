@@ -1,5 +1,4 @@
-content:
-   title: với mỗi chức năng mới của game, tạo một brach và cập nhật thêm code trên Git**
+**VỚI MỖI CHỨC NĂNG MỚI CỦA GAME, TẠO 1 BRANCH VÀ CẬP NHẬT THÊM CODE LÊN GIT**
 # Thành viên:
 - Thành viên 1: Nguyễn Việt Nhật  - MSSV: 21520378           
 - Thành viên 2: Hà Trọng Tài      - MSSV: 21520436   
