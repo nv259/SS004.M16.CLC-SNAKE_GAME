@@ -2,6 +2,11 @@
 GÓC Ý TƯỞNG:
 1. X to pause. (TunTun)
 2. Cứ mỗi 5 fruit ăn được thì sẽ được bonus 1 big fruit (x10 điểm -> Giảm dần theo thời gian). (D.Nhan)
+   Pandora box: Mỗi lần gọi fruit sẽ random ra 1 trong 4 loại fruit:
+      Type 1: Normal fruit: Thức ăn thường - cộng số điểm tương ứng.
+      Type 2: Festival fruit: Thức ăn lễ hội - cộng gấp 5 lần điểm tương ứng.
+      Type 3: Speed challenge: Thử thách tốc độ - Tăng gấp đôi tốc độ di chuyển của rắn.
+      Type 4: Draw back: 
 3. Được quyền chọn Game_level (1-2-3-4-5 tương ứng với số điểm nhận được khi ăn một fruit, số điểm kiến nghị: 5-10-15-20-25). (TronTai)
 4. Một vài portal cho phép dịch chuyển đến một portal khác. (V.Nhat.)
 5. Tích đủ điểm cho phép (tiêu điểm) sử dụng kỹ năng (vd: unvulnerable cho phép đi xuyên cơ thể trong vòng 3 4 bước ....) (V.Nhat.)
