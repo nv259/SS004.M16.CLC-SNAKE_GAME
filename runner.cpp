@@ -1,3 +1,4 @@
+
 // OTS : of the snake
 #include    <iostream>
 #include    <windows.h>
@@ -6,7 +7,7 @@
 #include    <cstdlib>
 #include	<random>
 #include    <ctime>
-
+int diem=1,toc_do=220;
 void gotoxy(int column, int line)
 {
 	COORD coord{};
@@ -90,13 +91,15 @@ public:
 	int x, y;
 
 	void make_food() {
-		std::random_device seed;
+		/* std::random_device seed;
 		std::mt19937 gen(seed());
 		std::uniform_int_distribution<int> distX(0, 29);
 		std::uniform_int_distribution<int> distY(0, 19);
 
 		x = distX(gen);
-		y = distY(gen);
+		y = distY(gen); */
+		x = rand() % 30;
+		y = rand() % 20;
 	}
 
 	bool isAble(SNAKE s) {
@@ -173,7 +176,7 @@ void eat_food(SNAKE& s, FOOD& fruit) {
 		s.snake[s.snake_length].y = s.snake[s.snake_length - 1].y;
 		s.snake_length++;
 		fruit.init(s);
-		player_score += 10;
+		player_score += diem;
 	}
 }
 
@@ -190,7 +193,22 @@ const std::string available_key = "xasdw";
 SNAKE snake;
 FOOD fruit;
 BOARD board;
-
+void Chon_level()
+{
+    std::string level;
+    std::cout<<"Vui long nhap so tu 1-->5 \n";
+    std::cin>>level;
+    while(2>1){
+      if(level.size()==1)
+        if(level[0]=='1' || level[0]=='2' || level[0]=='3' || level[0]=='4' || level[0]=='5')
+            break;
+       std::cout<<"Vui long nhap so tu 1-->5 \n";
+       std::cin>>level;
+    }
+    int _level=level[0]-'0';
+    diem=5*_level;
+    toc_do-=40*_level;
+}
 int main() {
 	// ios_base::sync_with_stdio(false);
 	// cin.tie(NULL);
@@ -198,6 +216,7 @@ int main() {
 
 	/* variables */
 
+    Chon_level();
 	SetConsoleCP(437);
 	SetConsoleOutputCP(437);
 
@@ -205,9 +224,9 @@ int main() {
 
 	snake.init();
 	fruit.init(snake);
+    // fruit.x = 12; fruit.y =14;
 
 	std::string reason;
-
 	while (!Game_over(snake, reason))
 	{
 		if (_kbhit())
@@ -233,7 +252,7 @@ int main() {
 		snake.draw();
 		eat_food(snake, fruit);
 		fruit.draw();
-		Sleep(100);
+		Sleep(toc_do);
 	}
 	gotoxy(0, 25);
 	std::cout << reason;
