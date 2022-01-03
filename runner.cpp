@@ -1,15 +1,12 @@
 // OTS : of the snake
 #include <iostream>
-#include <windows.h>
-#include <stdexcept>
+#include <Windows.h>
 #include <conio.h>
-#include <cstdlib>
 #include <random>
-#include <ctime>
 
 void gotoXY(int column, int line)
 {
-	COORD coord{};
+	COORD coord;
 	coord.X = column;
 	coord.Y = line;
 	SetConsoleCursorPosition(
@@ -85,8 +82,8 @@ public:
 		for (int i = 0; i < snake_length; i++)
 		{
 			gotoXY(snake[i].x, snake[i].y);
-			if (i == 0) std::cout << 'O';
-			else std::cout << 'o';
+			if (i == 0) std::cout << '@';
+			else std::cout << '#';
 		}
 	}
 };
@@ -100,8 +97,8 @@ public:
 	{
 		std::random_device seed;
 		std::mt19937 gen(seed());
-		std::uniform_int_distribution<int> distX(0, 29);
-		std::uniform_int_distribution<int> distY(0, 19);
+		std::uniform_int_distribution<int> distX(1, 29);
+		std::uniform_int_distribution<int> distY(1, 19);
 
 		x = distX(gen);
 		y = distY(gen);
@@ -120,16 +117,18 @@ public:
 
 	void init(SNAKE s)
 	{
-		do {
+		do
+		{
 			make_food();
-		} while (!isAble(s));
+		}
+		while (!isAble(s));
 	}
 
 	void draw()
 	{
 		gotoXY(x, y);
-		std::cout << (char)254;
-		gotoXY(0, 23);
+		std::cout << static_cast<char>(254);
+		gotoXY(0, 0);
 	}
 };
 
@@ -140,26 +139,26 @@ class BOARD
 public:
 	void draw()
 	{
-		std::cout << (char)218;
+		std::cout << static_cast<char>(218);
 		gotoXY(1, 0);
 		for (int i = 1; i < 31; i++)
-			std::cout << (char)196;
-		std::cout << (char)191 << '\n';
+			std::cout << static_cast<char>(196);
+		std::cout << static_cast<char>(191) << '\n';
 		for (int row = 1; row < 21; row++)
 		{
 			for (int col = 1; col < 33; col++)
 			{
-				if (col == 1 || col == 32) std::cout << (char)179;
-				else std::cout << " ";
+				if (col == 1 || col == 32) std::cout << static_cast<char>(179);
+				else std::cout << ' ';
 			}
 
 			std::cout << '\n';
 		}
 
-		std::cout << (char)192;
+		std::cout << static_cast<char>(192);
 		for (int i = 1; i < 31; i++)
-			std::cout << (char)196;
-		std::cout << (char)217 << "\n\nSCORE: " << player_score;
+			std::cout << static_cast<char>(196);
+		std::cout << static_cast<char>(217) << "\n\nScore: " << player_score;
 	}
 };
 
@@ -200,7 +199,8 @@ bool able_to_move(char direct, char pre_direct)
 	if (direct == 'a' && pre_direct != 'd' ||
 		direct == 'd' && pre_direct != 'a' ||
 		direct == 's' && pre_direct != 'w' ||
-		direct == 'w' && pre_direct != 's') return true;
+		direct == 'w' && pre_direct != 's')
+		return true;
 	return false;
 }
 
@@ -209,6 +209,75 @@ const std::string available_key = "xasdw";
 SNAKE snake;
 FOOD fruit;
 BOARD board;
+
+TCHAR pressAnyKey(const TCHAR* prompt = NULL)
+{
+	TCHAR ch;
+	DWORD mode;
+	DWORD count;
+	HANDLE hstdin = GetStdHandle(STD_INPUT_HANDLE);
+
+	// Prompt the user
+	if (prompt == NULL) prompt = TEXT("Paused! Press any key to continue...");
+	WriteConsole(
+		GetStdHandle(STD_OUTPUT_HANDLE),
+		prompt,
+		lstrlen(prompt),
+		&count,
+		NULL
+	);
+
+	// Switch to raw mode
+	GetConsoleMode(hstdin, &mode);
+	SetConsoleMode(hstdin, 0);
+
+	// Wait for the user's response
+	WaitForSingleObject(hstdin, INFINITE);
+
+	// Read the (single) key pressed
+	ReadConsole(hstdin, &ch, 1, &count, NULL);
+
+	// Restore the console to its previous state
+	SetConsoleMode(hstdin, mode);
+
+	// Return the key code
+	return ch;
+}
+
+void cls()
+{
+	// Get the Win32 handle representing standard output.
+	// This generally only has to be done once, so we make it static.
+	static const HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+
+	CONSOLE_SCREEN_BUFFER_INFO csbi;
+	COORD topLeft = {0, 0};
+
+	// std::cout uses a buffer to batch writes to the underlying console.
+	// We need to flush that to the console because we're circumventing
+	// std::cout entirely; after we clear the console, we don't want
+	// stale buffered text to randomly be written out.
+	std::cout.flush();
+
+	// Figure out the current width and height of the console window
+	if (!GetConsoleScreenBufferInfo(hOut, &csbi))
+	{
+		abort();
+	}
+	DWORD length = csbi.dwSize.X * csbi.dwSize.Y;
+
+	DWORD written;
+
+	// Flood-fill the console with spaces to clear it
+	FillConsoleOutputCharacter(hOut, TEXT(' '), length, topLeft, &written);
+
+	// Reset the attributes of every character to the default.
+	// This clears all background color formatting, if any.
+	FillConsoleOutputAttribute(hOut, csbi.wAttributes, length, topLeft, &written);
+
+	// Move the cursor back to the top left for the next sequence of writes
+	SetConsoleCursorPosition(hOut, topLeft);
+}
 
 int main()
 {
@@ -221,44 +290,73 @@ int main()
 	SetConsoleCP(437);
 	SetConsoleOutputCP(437);
 
-	char direct = 'x', pre_direct = 'a';
-
-	snake.init();
-	fruit.init(snake);
-
-	std::string reason;
-
-	while (!Game_over(snake, reason))
+	bool flag = false;
+	do
 	{
-		if (_kbhit())
-		{
-			pre_direct = direct;
-			direct = _getch();
-			if (!available_key.find(direct)) direct = pre_direct;
-			if (!able_to_move(direct, pre_direct)) direct = pre_direct;
-		}
+		std::string reason;
+		char direct = 'x', pre_direct = 'a';
 
-		system("cls");
+		snake.init();
+		fruit.init(snake);
 
-		if (direct == 'x')
+		while (!Game_over(snake, reason))
 		{
+			if (_kbhit())
+			{
+				pre_direct = direct;
+				direct = _getch();
+				if (direct == 'x')
+				{
+					gotoXY(0, 24);
+					pressAnyKey();
+					cls();
+				}
+				if (!available_key.find(direct)) direct = pre_direct;
+				if (!able_to_move(direct, pre_direct)) direct = pre_direct;
+			}
+
+			if (direct == 'x')
+			{
+				board.draw();
+				snake.draw();
+				fruit.draw();
+				Sleep(80);
+				continue;
+			}
+
 			board.draw();
+			snake.move(direct);
 			snake.draw();
+			eat_food(snake, fruit);
 			fruit.draw();
-			Sleep(70);
-			continue;
+			Sleep(80);
 		}
 
-		board.draw();
-		snake.move(direct);
-		snake.draw();
-		eat_food(snake, fruit);
-		fruit.draw();
-		Sleep(70);
-	}
+		short tempY = 25;
+		char opt = '\0';
+		do
+		{
+			gotoXY(0, tempY);
+			std::cout << reason << " Replay? [Y/N] => ";
+			std::cin >> opt;
 
-	gotoXY(0, 25);
-	std::cout << reason;
+			if (opt == 'Y' || opt == 'y')
+			{
+				player_score = 0;
+				cls();
+			}
+			else if (opt == 'N' || opt == 'n')
+				flag = true;
+			else
+			{
+				tempY++;
+				gotoXY(0, tempY);
+				std::cout << "Replay? [Y/N] = > ";
+			}
+		}
+		while (opt != 'Y' && opt != 'y' && opt != 'N' && opt != 'n');
+	}
+	while (!flag);
 
 	return 0;
 }
