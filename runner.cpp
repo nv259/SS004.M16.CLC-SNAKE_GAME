@@ -13,7 +13,7 @@ int player_score;
 bool cheat = false;
 bool End_game = false;
 int count_phase = 1;
-// Đức Nhân
+// �?c Nh�n
 void gotoxy(int column, int line)
 {
 	COORD coord{};
@@ -39,6 +39,7 @@ struct High_score
 	char user_name[30];
 };
 
+bool is_going_through_portal, first_step;
 class SNAKE {
 public:
 	int snake_length;
@@ -46,22 +47,26 @@ public:
 
 	void move(char direct) {
 		/* move the head */
-		snake[0].pre_x = snake[0].x;
-		snake[0].pre_y = snake[0].y;
-		switch (direct) {
-		case 'a':
-			snake[0].x--;
-			break;
-		case 's':
-			snake[0].y++;
-			break;
-		case 'd':
-			snake[0].x++;
-			break;
-		case 'w':
-			snake[0].y--;
-			break;
+		if (!is_going_through_portal || !first_step)
+		{
+		    snake[0].pre_x = snake[0].x;
+            snake[0].pre_y = snake[0].y;
 		}
+
+        switch (direct) {
+        case 'a':
+            snake[0].x--;
+            break;
+        case 's':
+            snake[0].y++;
+            break;
+        case 'd':
+            snake[0].x++;
+            break;
+        case 'w':
+            snake[0].y--;
+            break;
+        }
 
 		/* move the part */
 		for (int i = 1; i < snake_length; i++)
@@ -71,6 +76,7 @@ public:
 			snake[i].x = snake[i - 1].pre_x;
 			snake[i].y = snake[i - 1].pre_y;
 		}
+		first_step = false;
 	}
 
 	void init() {
@@ -86,7 +92,7 @@ public:
 	void draw() {
 		for (int i = 0; i < snake_length; i++)
 		{
-			gotoxy(snake[i].x, snake[i].y);
+            gotoxy(snake[i].x, snake[i].y);
 			if (i == 0) std::cout << 'O';
 			else std::cout << 'o';
 		}
@@ -98,10 +104,10 @@ class FOOD
 public:
 	int x, y;
     int type;
-    // Type 1: Thức ăn thường
-    // Type 2: x5 điểm nhận vào
-    // Type 3: x2 tốc độ chạy :)))))))))))
-    // type 4: -5*base_score (nếu âm thì set lại là 0)
+    // Type 1: Th?c an thu?ng
+    // Type 2: x5 di?m nh?n v�o
+    // Type 3: x2 t?c d? ch?y :)))))))))))
+    // type 4: -5*base_score (n?u �m th� set l?i l� 0)
 	void make_food() {
 		/* std::random_device seed;
 		std::mt19937 gen(seed());
@@ -154,6 +160,41 @@ public:
 		std::cout << (char)254;
 		gotoxy(0, 23);
 	}
+};
+
+bool portal_is_opening;
+int time_left_for_portal_to_disappear;
+class PORTAL {
+public:
+    int x, y;
+
+    void make_portal() {
+        x = rand() % 30;
+        y = rand() % 20;
+    }
+
+    bool is_able(SNAKE s, FOOD f, PORTAL p) {
+		if (x == 0 || x == 30 || y == 0 || y == 20) return false;
+		for (int i = 0; i < s.snake_length; i++)
+			if (s.snake[i].x == x && s.snake[i].y == y) return false;
+
+        if (x == f.x && y == f.y) return false;
+        if (x == p.x && y == p.y) return false;
+
+		return true;
+    }
+
+    void init(SNAKE s, FOOD f, PORTAL p) {
+        do {
+            make_portal();
+        } while (!is_able(s, f, p));
+    }
+
+    void draw() {
+        gotoxy(x, y);
+        std::cout << time_left_for_portal_to_disappear;
+        gotoxy(0, 23);
+    }
 };
 
 class BOARD {
@@ -232,7 +273,9 @@ const std::string available_key = "0xasdw";
 SNAKE snake;
 FOOD fruit;
 BOARD board;
-void Chon_level()
+PORTAL portal1, portal2;
+
+void Game_level()
 {
     std::string level;
     int _level;
@@ -285,15 +328,33 @@ char curr_direct(SNAKE s) {
     return 'a';
 }
 
+void try_make_portal() {
+    if (rand() % 1 == 0)
+    {
+        portal1.init(snake, fruit, portal2);
+        portal2.init(snake, fruit, portal1);
+        time_left_for_portal_to_disappear = 50;
+        portal_is_opening = true;
+    }
+}
+
+bool go_to_portal(PORTAL in, PORTAL out, char direct) {
+        if (snake.snake[0].x == in.x && snake.snake[0].y == in.y)
+        {
+            snake.snake[0].pre_x = snake.snake[0].x;
+            snake.snake[0].pre_y = snake.snake[0].y;
+            snake.snake[0].x = out.x;
+            snake.snake[0].y = out.y;
+            is_going_through_portal = true;
+            first_step = true;
+            return true;
+        }
+        return false;
+}
+
 int main()
 {
-	// ios_base::sync_with_stdio(false);
-	// cin.tie(NULL);
-	// srand(time(NULL));
-
-	/* variables */
-
-    Chon_level();
+    Game_level();
 
     if (End_game)
     {
@@ -305,7 +366,7 @@ int main()
         std::cout << "  X    XX   XX    X X X X XXX   X X   XXX  XX  XXX XXX X X \n";
         return 0;
     }
-    // Nhập sai cheatcode
+    // Nh?p sai cheatcode
 	SetConsoleCP(437);
 	SetConsoleOutputCP(437);
 
@@ -317,7 +378,7 @@ int main()
 
   	while (!Game_over(snake, reason))
 	{
-		if (_kbhit())
+	    if (_kbhit())
 		{
 			pre_direct = direct;
 			direct = _getch();
@@ -342,10 +403,27 @@ int main()
 		}
 
 		board.draw();
+		if (time_left_for_portal_to_disappear > 0)
+        {
+            if (!go_to_portal(portal1, portal2, direct))
+                go_to_portal(portal2, portal1, direct);
+        }
 		snake.move(direct);
 		snake.draw();
 		eat_food(snake, fruit);
 		fruit.draw();
+
+		time_left_for_portal_to_disappear--;
+		if (time_left_for_portal_to_disappear <= 0)
+            portal_is_opening = false;
+		if (time_left_for_portal_to_disappear > 0)
+        {
+            portal1.draw();
+            portal2.draw();
+        }
+		if (!portal_is_opening)
+            try_make_portal();
+
 		if (cheat)
             if (count_phase % 7 == 0)
                 if (game_speed >= 30)
@@ -357,3 +435,4 @@ int main()
 
 	return 0;
 }
+
