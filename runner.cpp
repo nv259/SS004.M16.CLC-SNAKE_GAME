@@ -1,5 +1,3 @@
-
-// OTS : of the snake
 #include    <iostream>
 #include    <windows.h>
 #include	<stdexcept>
@@ -7,7 +5,15 @@
 #include    <cstdlib>
 #include	<random>
 #include    <ctime>
-int diem=1,toc_do=220;
+
+int base_score=1;
+double game_speed=220;
+int player_score;
+
+bool cheat = false;
+bool End_game = false;
+int count_phase = 1;
+// Đức Nhân
 void gotoxy(int column, int line)
 {
 	COORD coord{};
@@ -19,7 +25,8 @@ void gotoxy(int column, int line)
 	);
 }
 
-struct  Point {
+struct  Point
+{
 	int x, y;
 	// using pre_x, pre_y to store pre position of this point
 	// so that it is easier to update next point OTS
@@ -86,20 +93,44 @@ public:
 	}
 };
 
-class FOOD {
+class FOOD
+{
 public:
 	int x, y;
-
+    int type;
+    // Type 1: Thức ăn thường
+    // Type 2: x5 điểm nhận vào
+    // Type 3: x2 tốc độ chạy :)))))))))))
+    // type 4: -5*base_score (nếu âm thì set lại là 0)
 	void make_food() {
 		/* std::random_device seed;
 		std::mt19937 gen(seed());
 		std::uniform_int_distribution<int> distX(0, 29);
 		std::uniform_int_distribution<int> distY(0, 19);
-
 		x = distX(gen);
 		y = distY(gen); */
 		x = rand() % 30;
-		y = rand() % 20;
+            y = rand() % 20;
+		if (count_phase % 5 == 0)
+        {
+            if (!cheat) type = rand() % 4 + 1;
+            else type = 2;
+            if (type == 2)
+                player_score += 4 * base_score;
+            if (type == 3)
+            {
+                if (game_speed >= 20) game_speed /= 2;
+                else game_speed = 1;
+            }
+            if (type == 4)
+            {
+                player_score = player_score - 2 * base_score;
+                if (player_score < 0) player_score = 0;
+            }
+        }
+        else
+            if (cheat)
+                player_score += 4 * base_score;
 	}
 
 	bool isAble(SNAKE s) {
@@ -125,11 +156,10 @@ public:
 	}
 };
 
-int player_score;
-
 class BOARD {
 public:
-	void    draw() {
+	void draw()
+	{
 		std::cout << (char)218;
 		gotoxy(1, 0);
 		for (int i = 1; i < 31; i++)
@@ -151,7 +181,8 @@ public:
 	}
 };
 
-bool Game_over(SNAKE s, std::string& reason) {
+bool Game_over(SNAKE s, std::string& reason)
+{
 	/* snake hit the wall */
 	if (s.snake[0].x > 30 || s.snake[0].x < 1 || s.snake[0].y > 20 || s.snake[0].y < 1)
 	{
@@ -170,25 +201,33 @@ bool Game_over(SNAKE s, std::string& reason) {
 	return false;
 }
 
-void eat_food(SNAKE& s, FOOD& fruit) {
-	if (s.snake[0].x == fruit.x && s.snake[0].y == fruit.y) {
+void eat_food(SNAKE& s, FOOD& fruit)
+{
+	if (s.snake[0].x == fruit.x && s.snake[0].y == fruit.y)
+    {
 		s.snake[s.snake_length].x = s.snake[s.snake_length - 1].x;
 		s.snake[s.snake_length].y = s.snake[s.snake_length - 1].y;
 		s.snake_length++;
 		fruit.init(s);
-		player_score += diem;
+		player_score += base_score;
+		count_phase++;
 	}
 }
 
 bool able_to_move(char direct, char pre_direct) {
+    // snake can move to wasd
 	if (direct == 'a' && pre_direct != 'd'
 		|| direct == 'd' && pre_direct != 'a'
 		|| direct == 's' && pre_direct != 'w'
 		|| direct == 'w' && pre_direct != 's') return true;
+
+    // game paused
+    if (direct == 'x') return true;
+
 	return false;
 }
 
-const std::string available_key = "xasdw";
+const std::string available_key = "0xasdw";
 
 SNAKE snake;
 FOOD fruit;
@@ -196,20 +235,58 @@ BOARD board;
 void Chon_level()
 {
     std::string level;
+    int _level;
     std::cout<<"Vui long nhap so tu 1-->5 \n";
     std::cin>>level;
-    while(2>1){
-      if(level.size()==1)
-        if(level[0]=='1' || level[0]=='2' || level[0]=='3' || level[0]=='4' || level[0]=='5')
-            break;
-       std::cout<<"Vui long nhap so tu 1-->5 \n";
-       std::cin>>level;
+    if (level == "862006")
+    {
+        //std::cout << "You are a loser";
+        End_game = true;
     }
-    int _level=level[0]-'0';
-    diem=5*_level;
-    toc_do-=40*_level;
+    else
+    {
+        if (level == "21520378")
+            _level = 6;
+        else
+        {
+            while(1)
+            {
+              if(level.size()==1)
+                if(level[0]=='1' || level[0]=='2' || level[0]=='3' || level[0]=='4' || level[0]=='5')
+                    break;
+               std::cout<<"Vui long nhap so tu 1-->5 \n";
+               std::cin>>level;
+            }
+            _level=level[0]-'0';
+            base_score=5*_level;
+            game_speed-=40*_level;
+        }
+        if (_level == 6)
+        {
+            std::string cheating = "You are cheating.(#_<-)";
+            for (int i = 0; i < cheating.size(); i++)
+            {
+                std::cout << cheating[i];
+                Sleep(50);
+            }
+            Sleep(500);
+            cheat = true;
+            base_score = 150;
+            game_speed = 150;
+        }
+    }
+
 }
-int main() {
+
+char curr_direct(SNAKE s) {
+    if (s.snake[0].x == s.snake[1].x && s.snake[0].y == s.snake[1].y - 1) return 'w';
+    if (s.snake[0].x == s.snake[1].x && s.snake[0].y == s.snake[1].y + 1) return 's';
+    if (s.snake[0].x == s.snake[1].x + 1 && s.snake[0].y == s.snake[1].y) return 'd';
+    return 'a';
+}
+
+int main()
+{
 	// ios_base::sync_with_stdio(false);
 	// cin.tie(NULL);
 	// srand(time(NULL));
@@ -217,24 +294,41 @@ int main() {
 	/* variables */
 
     Chon_level();
+
+    if (End_game)
+    {
+        char X = (char)254;
+        std::cout << "X   X  XX  X  X    X  XX  XXX    X    X    XX  XXX XXX XX \n";
+        std::cout << " X X  X  X X  X   X X X X X     X X   X   X  X X   X   X X \n";
+        std::cout << "  X   X  X X  X   XXX XX  XXX   XXX   X   X  X XXX XXX XX \n";
+        std::cout << "  X   X  X X  X   X X X X X     X X   X   X  X   X X   X X \n";
+        std::cout << "  X    XX   XX    X X X X XXX   X X   XXX  XX  XXX XXX X X \n";
+        return 0;
+    }
+    // Nhập sai cheatcode
 	SetConsoleCP(437);
 	SetConsoleOutputCP(437);
 
-	char direct = 'x', pre_direct = 'a';
+    char direct = 'x', pre_direct = 'a';
+    std::string reason;
 
 	snake.init();
 	fruit.init(snake);
-    // fruit.x = 12; fruit.y =14;
 
-	std::string reason;
-	while (!Game_over(snake, reason))
+  	while (!Game_over(snake, reason))
 	{
 		if (_kbhit())
 		{
 			pre_direct = direct;
 			direct = _getch();
+
 			if (!available_key.find(direct)) direct = pre_direct;
 			if (!able_to_move(direct, pre_direct)) direct = pre_direct;
+			if (pre_direct = 'x' && !able_to_move(direct, curr_direct(snake)))
+            {
+                direct = 'x';
+                pre_direct = curr_direct(snake);
+            }
 		}
 		system("cls");
 
@@ -252,7 +346,11 @@ int main() {
 		snake.draw();
 		eat_food(snake, fruit);
 		fruit.draw();
-		Sleep(toc_do);
+		if (cheat)
+            if (count_phase % 7 == 0)
+                if (game_speed >= 30)
+                    game_speed -= 20;
+		Sleep(game_speed);
 	}
 	gotoxy(0, 25);
 	std::cout << reason;
