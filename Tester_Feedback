@@ -3,4 +3,4 @@
 3. [SOLVED] Ở phần chọn cấp độ game, khi nhập 1 kí tự sẽ gặp lỗi lặp vô hạn.
 4. Portal đã đóng nhưng con rắn vẫn đi qua được -> vô lý !
 5. Thêm lựa chọn yes/no khi ấn 'r' lúc đang chơi (đảm bảo người chơi chắc chắn muốn restart)
-6.
+6. Thêm bảng lựa chọn khi bấm 'x' để xem người muốn chơi tiếp hay thoát ra
