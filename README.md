@@ -8,7 +8,7 @@
 - Thành viên 4: Lê Thị Thanh Tâm  - MSSV: 21522825 
 - Thành viên 5: Võ Thị Phương Anh - MSSV: 21522883
 
-# BẢN TIẾN ĐỘ
+# BẢNG TIẾN ĐỘ/ DEADLINE
 - Trello nhóm:
 - https://trello.com/invite/b/N8J5ccaW/9c509a0a905488bccdf545c22798ce1b/project-management
 
