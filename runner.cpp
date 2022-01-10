@@ -14,8 +14,7 @@ bool cheat = false;
 bool End_game = false;
 int count_phase = 1;
 // Ð?c Nhân
-void gotoxy(int column, int line)
-{
+void gotoxy(int column, int line){
 	COORD coord{};
 	coord.X = column;
 	coord.Y = line;
@@ -99,8 +98,7 @@ public:
 	}
 };
 
-class FOOD
-{
+class FOOD{
 public:
 	int x, y;
     int type;
@@ -222,8 +220,7 @@ public:
 	}
 };
 
-bool Game_over(SNAKE s, std::string& reason)
-{
+bool Game_over(SNAKE s, std::string& reason){
 	/* snake hit the wall */
 	if (s.snake[0].x > 30 || s.snake[0].x < 1 || s.snake[0].y > 20 || s.snake[0].y < 1)
 	{
@@ -242,8 +239,7 @@ bool Game_over(SNAKE s, std::string& reason)
 	return false;
 }
 
-void eat_food(SNAKE& s, FOOD& fruit)
-{
+void eat_food(SNAKE& s, FOOD& fruit){
 	if (s.snake[0].x == fruit.x && s.snake[0].y == fruit.y)
     {
 		s.snake[s.snake_length].x = s.snake[s.snake_length - 1].x;
@@ -264,7 +260,7 @@ bool able_to_move(char direct, char pre_direct) {
 
     // game paused
     if (direct == 'x') return true;
-
+    if (direct == 'r' || direct == 'R') return true;
 	return false;
 }
 
@@ -275,11 +271,10 @@ FOOD fruit;
 BOARD board;
 PORTAL portal1, portal2;
 
-void Game_level()
-{
+void Game_level(){
     std::string level;
     int _level;
-    std::cout<<"Vui long nhap so tu 1-->5 \n";
+    std::cout<<"Vui long chon cap do tu 1 --> 5 \nPs: cap do la so nguyen lon hon 0 va be hon 6 \n";
     std::cin>>level;
     if (level == "862006")
     {
@@ -351,9 +346,27 @@ bool go_to_portal(PORTAL in, PORTAL out, char direct) {
         }
         return false;
 }
+void Restart()
+{
+    base_score = 1;
+    game_speed = 220;
+    player_score = 0;
 
+    cheat = false;
+    End_game = false;
+    count_phase = 1;
+    is_going_through_portal, first_step;
+    SNAKE snake;
+    FOOD fruit;
+    BOARD board;
+    PORTAL portal1, portal2;
+    portal_is_opening;
+    time_left_for_portal_to_disappear;
+}
 int main()
 {
+    REPLAY:{
+    Restart();
     Game_level();
 
     if (End_game)
@@ -371,15 +384,16 @@ int main()
 	SetConsoleOutputCP(437);
 
     char direct = 'x', pre_direct = 'a';
-    std::string reason;
+
 
 	snake.init();
 	fruit.init(snake);
-
+     std::string reason;
   	while (!Game_over(snake, reason))
 	{
-	    if (_kbhit())
+	   if (_kbhit())
 		{
+
 			pre_direct = direct;
 			direct = _getch();
 
@@ -390,9 +404,9 @@ int main()
                 direct = 'x';
                 pre_direct = curr_direct(snake);
             }
+
 		}
 		system("cls");
-
 		if (direct == 'x')
 		{
 			board.draw();
@@ -431,8 +445,21 @@ int main()
 		Sleep(game_speed);
 	}
 	gotoxy(0, 25);
-	std::cout << reason;
+	std::cout << reason<<std::endl;
 
-	return 0;
+        if(direct == 'r' || direct == 'R'){
+          system("cls");
+          goto REPLAY;
+        }
+    }
+    std::cout<<"An r de choi lai hoac an Esc de thoat game\n";
+    NHAPLAI: char directs = _getch();
+    if(directs == 'r' || directs == 'R'){
+    system("cls");
+    goto REPLAY;
+    }
+    else if(directs == 27)
+	  return 0;
+    else goto NHAPLAI;
+    return 0;
 }
-
