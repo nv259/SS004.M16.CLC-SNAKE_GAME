@@ -13,7 +13,9 @@ int player_score;
 bool cheat = false;
 bool End_game = false;
 int count_phase = 1;
-// Ð?c Nhân
+bool dead_by_multiuniverse = false;
+int time_left_for_portal_to_disappear;
+// ï¿½?c Nhï¿½n
 void gotoxy(int column, int line)
 {
 	COORD coord{};
@@ -53,6 +55,8 @@ public:
             snake[0].pre_y = snake[0].y;
 		}
 
+		bool temp = false;
+
         switch (direct) {
         case 'a':
             snake[0].x--;
@@ -75,8 +79,15 @@ public:
 			snake[i].pre_y = snake[i].y;
 			snake[i].x = snake[i - 1].pre_x;
 			snake[i].y = snake[i - 1].pre_y;
+			if (abs(snake[i-1].x - snake[i].x) + abs(snake[i-1].y - snake[i].y) > 1)
+            {
+                temp = true;
+            }
 		}
 		first_step = false;
+		is_going_through_portal = temp;
+		if (time_left_for_portal_to_disappear <= 0 && is_going_through_portal)
+			dead_by_multiuniverse = true;
 	}
 
 	void init() {
@@ -87,6 +98,15 @@ public:
 		snake[1].y = 10;
 		snake[2].x = 16;
 		snake[2].y = 10;
+
+        /*
+		// init the snake with length = 20
+		for (int i = 3; i < 20; i++)
+		{
+			snake[i].x = 14 + i;
+			snake[i].y = 10;
+		}
+        */
 	}
 
 	void draw() {
@@ -105,9 +125,9 @@ public:
 	int x, y;
     int type;
     // Type 1: Th?c an thu?ng
-    // Type 2: x5 di?m nh?n vào
+    // Type 2: x5 di?m nh?n vï¿½o
     // Type 3: x2 t?c d? ch?y :)))))))))))
-    // type 4: -5*base_score (n?u âm thì set l?i là 0)
+    // type 4: -5*base_score (n?u ï¿½m thï¿½ set l?i lï¿½ 0)
 	void make_food() {
 		/* std::random_device seed;
 		std::mt19937 gen(seed());
@@ -163,7 +183,6 @@ public:
 };
 
 bool portal_is_opening;
-int time_left_for_portal_to_disappear;
 class PORTAL {
 public:
     int x, y;
@@ -224,6 +243,13 @@ public:
 
 bool Game_over(SNAKE s, std::string& reason)
 {
+	/* portal cut the snake */
+	if (dead_by_multiuniverse)
+	{
+		reason = "Oh no! Your tail is teleported to another universe, you're shocked to dead!";
+		return true;
+	}
+
 	/* snake hit the wall */
 	if (s.snake[0].x > 30 || s.snake[0].x < 1 || s.snake[0].y > 20 || s.snake[0].y < 1)
 	{
@@ -329,7 +355,7 @@ char curr_direct(SNAKE s) {
 }
 
 void try_make_portal() {
-    if (rand() % 1 == 0)
+    if (rand() % 10 == 0)
     {
         portal1.init(snake, fruit, portal2);
         portal2.init(snake, fruit, portal1);
@@ -435,4 +461,3 @@ int main()
 
 	return 0;
 }
-
