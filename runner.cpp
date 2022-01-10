@@ -260,7 +260,7 @@ bool able_to_move(char direct, char pre_direct) {
 
     // game paused
     if (direct == 'x') return true;
-    if (direct == 'r') return true;
+    if (direct == 'r' || direct == 'R') return true;
 	return false;
 }
 
@@ -274,7 +274,7 @@ PORTAL portal1, portal2;
 void Game_level(){
     std::string level;
     int _level;
-    std::cout<<"Vui long nhap so tu 1-->5 \n";
+    std::cout<<"Vui long chon cap do tu 1 --> 5 \nPs: cap do la so nguyen lon hon 0 va be hon 6 \n";
     std::cin>>level;
     if (level == "862006")
     {
@@ -447,16 +447,19 @@ int main()
 	gotoxy(0, 25);
 	std::cout << reason<<std::endl;
 
-        if(direct == 'r'){
+        if(direct == 'r' || direct == 'R'){
           system("cls");
           goto REPLAY;
         }
     }
-    std::cout<<"an r de choi lai\n";
-    char directs = _getch();
-    if(directs == 'r'){
+    std::cout<<"An r de choi lai hoac an Esc de thoat game\n";
+    NHAPLAI: char directs = _getch();
+    if(directs == 'r' || directs == 'R'){
     system("cls");
     goto REPLAY;
     }
-	return 0;
+    else if(directs == 27)
+	  return 0;
+    else goto NHAPLAI;
+    return 0;
 }
