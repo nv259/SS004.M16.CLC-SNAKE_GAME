@@ -35,10 +35,9 @@ struct  Point
 	int pre_x, pre_y;
 };
 
-struct High_score
-{
-	int score;
-	char user_name[30];
+struct High_score {
+    int score;
+    char user_name[30];
 };
 
 bool is_going_through_portal, first_step;
