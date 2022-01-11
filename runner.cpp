@@ -301,7 +301,60 @@ PORTAL portal1, portal2;
 void Game_level(){
     std::string level;
     int _level;
-    std::cout<<"Vui long chon cap do tu 1 --> 5 \nPs: cap do la so nguyen lon hon 0 va be hon 6 \n";
+    std::cout<<"Hay chon cap do cho minh tu 1 --> 5 \
+      \nPs: cap do la so nguyen lon hon 0 va be hon 6 \n";
+    std::cin>>level;
+    if (level == "862006")
+    {
+        //std::cout << "You are a loser";
+        End_game = true;
+    }
+    else
+    {
+        if (level == "21520378")
+            _level = 6;
+        else
+        {
+            while(1)
+            {
+              if(level.size()==1)
+                if(level[0]=='1' || level[0]=='2' || level[0]=='3' || level[0]=='4' || level[0]=='5')
+                    break;
+               std::cout<<"Vui long nhap so tu 1-->5 \n";
+               std::cin>>level;
+            }
+            _level=level[0]-'0';
+            base_score=5*_level;
+            game_speed-=40*_level;
+            system("cls");
+            std::string hello = "------CHAO MUNG BAN DEN VOI SNAKE GAME-----<3\nSu dung 'a' 'w' 'd' 's' de di chuyen\nchon 'r' hay 'R' de choi lai tu dau\nchon 'x' de dung tam thoi";
+            for(int i = 0; i<hello.size(); i++)
+            {
+                std::cout<<hello[i];
+                Sleep(50);
+            }
+            Sleep(2000);
+        }
+        if (_level == 6)
+        {
+            std::string cheating = "You are cheating.(#_<-)";
+            for (int i = 0; i < cheating.size(); i++)
+            {
+                std::cout << cheating[i];
+                Sleep(50);
+            }
+            Sleep(500);
+            cheat = true;
+            base_score = 150;
+            game_speed = 150;
+        }
+    }
+
+}
+void Game_level_1(){
+    std::string level;
+    int _level;
+    std::cout<<"Vui long chon lai cap do tu 1 --> 5 \n";
     std::cin>>level;
     if (level == "862006")
     {
@@ -392,18 +445,20 @@ void Restart()
 }
 int main()
 {
+    int k=0;
     REPLAY:{
     Restart();
-    Game_level();
+    if(!k) { Game_level(); k=1;}
+    else Game_level_1();
 
     if (End_game)
     {
         char X = (char)254;
-        std::cout << "X   X  XX  X  X    X  XX  XXX    X    X    XX  XXX XXX XX \n";
-        std::cout << " X X  X  X X  X   X X X X X     X X   X   X  X X   X   X X \n";
-        std::cout << "  X   X  X X  X   XXX XX  XXX   XXX   X   X  X XXX XXX XX \n";
-        std::cout << "  X   X  X X  X   X X X X X     X X   X   X  X   X X   X X \n";
-        std::cout << "  X    XX   XX    X X X X XXX   X X   XXX  XX  XXX XXX X X \n";
+        std::cout << "X   X  XX  X  X    X  XX  XXX    X    X    XX  XXX XXX XX\n";
+        std::cout << " X X  X  X X  X   X X X X X     X X   X   X  X X   X   X X\n";
+        std::cout << "  X   X  X X  X   XXX XX  XXX   XXX   X   X  X XXX XXX XX\n";
+        std::cout << "  X   X  X X  X   X X X X X     X X   X   X  X   X X   X X\n";
+        std::cout << "  X    XX   XX    X X X X XXX   X X   XXX  XX  XXX XXX X  X\n";
         return 0;
     }
     // Nh?p sai cheatcode
