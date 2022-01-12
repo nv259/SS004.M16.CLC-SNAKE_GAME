@@ -1,6 +1,6 @@
 //===========================================
 GÓC Ý TƯỞNG:
-1. X to pause. (TunTun)
+1. X to pause. (Thanh Tâm)
 2. Cứ mỗi 5 fruit ăn được thì sẽ được bonus 1 big fruit (x10 điểm -> Giảm dần theo thời gian). (D.Nhan)
    Pandora box: Mỗi lần gọi fruit sẽ random ra 1 trong 4 loại fruit:
       Type 1: Normal fruit: Thức ăn thường - cộng số điểm tương ứng.
@@ -11,5 +11,6 @@ GÓC Ý TƯỞNG:
 4. Một vài portal cho phép dịch chuyển đến một portal khác. (V.Nhat.)
 5. Tích đủ điểm cho phép (tiêu điểm) sử dụng kỹ năng (vd: unvulnerable cho phép đi xuyên cơ thể trong vòng 3 4 bước ....) (V.Nhat.)
 6. Bảng high_score lưu lại top 5 người chơi. (P.Anh)
-7. Nhạc nền cho game.
+7. Lựa chọn replay khi game over. (Thanh Tâm)
+8. Nhạc nền cho game.
 ============================================//
