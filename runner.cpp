@@ -536,6 +536,10 @@ int main()
 
 REPLAY:
 	{
+        std::sort(scores, scores + len, cmp_score);
+        for (int i = 0; i < len; i++)
+            output << scores[i].user_name << " " << scores[i].score << "\n"; 
+            
 		restart();
 		game_level();
 		cls();
