@@ -121,8 +121,8 @@ public:
 		// init the snake with length = 20
 		for (int i = 3; i < 20; i++)
 		{
-		    snake[i].x = 14 + i;
-		    snake[i].y = 10;
+			snake[i].x = 14 + i;
+			snake[i].y = 10;
 		}
 		*/
 	}
@@ -547,11 +547,29 @@ REPLAY:
 					direct = pre_direct;
 			}
 
+			if (direct == 'r' || direct == 'R')
+			{
+				gotoxy(0, 24);
+				std::cout << "You press 'r' while playing, do you wish to restart? [Y/N]";
+				RESTART: const char opt = _getch();
+				if (opt == 'y' || opt == 'Y')
+				{
+					cls();
+					goto REPLAY;
+				}
+				if (opt == 'n' || opt == 'N')
+				{
+					direct = pre_direct;
+					continue;
+				}
+
+				goto RESTART;
+			}
+
 			if (direct == 'x')
 			{
 				if (start)
 				{
-
 					const std::string welcome = "WELCOME TO SNAKE GAME!";
 					std::cout << "\t\t\t\t\t" << Color(10);
 					for (const char c : welcome)
@@ -611,12 +629,6 @@ REPLAY:
 		}
 		gotoxy(0, 25);
 		std::cout << reason << std::endl;
-
-		if (direct == 'r' || direct == 'R')
-		{
-			cls();
-			goto REPLAY;
-		}
 	}
 	std::cout << "Press 'r' to replay or 'Esc' to exit...";
 
