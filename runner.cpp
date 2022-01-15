@@ -3,6 +3,7 @@
 #include <conio.h>
 #include <cstdlib>
 #include <random>
+#include <ctime>
 
 class Color
 {
@@ -146,18 +147,12 @@ public:
 	int x;
 	int y;
 	int type;
-	// Type 1: Th?c an thu?ng
-	// Type 2: x5 di?m nh?n v?o
-	// Type 3: x2 t?c d? ch?y :)))))))))))
-	// type 4: -5*base_score (n?u ?m th? set l?i l? 0)
+	
 	void make_food()
 	{
-		std::random_device seed;
-		std::mt19937 gen(seed());
-		const std::uniform_int_distribution<int> dist_x(1, 29);
-		const std::uniform_int_distribution<int> dist_y(2, 21);
-		x = dist_x(gen);
-		y = dist_y(gen);
+        srand(unsigned (time(NULL)));
+        x = rand() % 30;
+        y = rand() % 20;
 
 		if (count_phase % 5 == 0)
 		{
@@ -226,12 +221,8 @@ public:
 
 	void make_portal()
 	{
-		std::random_device seed;
-		std::mt19937 gen(seed());
-		const std::uniform_int_distribution<int> dist_x(1, 29);
-		const std::uniform_int_distribution<int> dist_y(2, 21);
-		x = dist_x(gen);
-		y = dist_y(gen);
+        x = rand() % 30;
+        y = rand() % 20;
 	}
 
 	bool is_able(const SNAKE s, const FOOD f, const PORTAL p) const
