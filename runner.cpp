@@ -3,6 +3,7 @@
 #include <conio.h>
 #include <cstdlib>
 #include <random>
+#pragma comment(lib, "Winmm.lib")
 
 class Color
 {
@@ -32,7 +33,7 @@ int time_left_for_portal_to_disappear;
 // ??c Nh?n
 void gotoxy(short column, short line)
 {
-	const COORD coord{column, line};
+	const COORD coord{ column, line };
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
 }
 
@@ -204,8 +205,7 @@ public:
 		do
 		{
 			make_food();
-		}
-		while (!is_able(s));
+		} while (!is_able(s));
 	}
 
 	void draw() const
@@ -255,8 +255,7 @@ public:
 		do
 		{
 			make_portal();
-		}
-		while (!is_able(s, f, p));
+		} while (!is_able(s, f, p));
 	}
 
 	void draw() const
@@ -485,7 +484,7 @@ void cls()
 	static HANDLE console_handle = GetStdHandle(STD_OUTPUT_HANDLE);
 
 	CONSOLE_SCREEN_BUFFER_INFO csbi;
-	constexpr COORD topLeft{0, 0};
+	constexpr COORD topLeft{ 0, 0 };
 
 	std::cout.flush();
 
@@ -507,6 +506,9 @@ int main()
 {
 	SetConsoleCP(437);
 	SetConsoleOutputCP(437);
+
+	PlaySound(TEXT("snake-game-theme.wav"), GetModuleHandle(NULL), SND_FILENAME | SND_ASYNC);
+	//sndPlaySound(TEXT("snake-game-theme.wav"), SND_FILENAME | SND_ASYNC | SND_LOOP);
 
 REPLAY:
 	{
@@ -545,6 +547,25 @@ REPLAY:
 
 				if (!able_to_move(direct, pre_direct))
 					direct = pre_direct;
+			}
+
+			if (direct == 'r' || direct == 'R')
+			{
+				gotoxy(0, 24);
+				std::cout << "You press 'r' while playing, do you wish to restart? [Y/N]";
+			RESTART: const char opt = _getch();
+				if (opt == 'y' || opt == 'Y')
+				{
+					cls();
+					goto REPLAY;
+				}
+				if (opt == 'n' || opt == 'N')
+				{
+					direct = pre_direct;
+					continue;
+				}
+
+				goto RESTART;
 			}
 
 			if (direct == 'x')
