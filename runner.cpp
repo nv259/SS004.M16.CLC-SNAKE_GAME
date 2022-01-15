@@ -685,9 +685,16 @@ REPLAY:
 
 		snake.init();
 		fruit.init(snake);
-        gotoxy(50, 50);
-        std::string temp = "GENERATING YARD.....";
+        gotoxy(40, 50);
+        std::string temp = "GENERATING YARD.......";
         for (char c : temp)
+        {
+            std::cout << c;
+            Sleep(80);
+        }
+        Sleep(300);
+        temp = "DO NOT PRESS X........";
+        for (char c: temp)
         {
             std::cout << c;
             Sleep(80);
@@ -735,6 +742,7 @@ REPLAY:
 			{
 				if (start)
 				{
+                    gotoxy(15, 30);
 					const std::string welcome = "WELCOME TO SNAKE GAME!";
 					std::cout << "\t\t\t\t\t" << Color(10);
 					for (const char c : welcome)
@@ -743,7 +751,7 @@ REPLAY:
 						Sleep(80);
 					}
 					std::cout << Color(7);
-					Sleep(300);
+					Sleep(500);
 
 					cls();
 					board.draw();
