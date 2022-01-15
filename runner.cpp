@@ -151,8 +151,8 @@ public:
 	void make_food()
 	{
         srand(unsigned (time(NULL)));
-        x = rand() % 30;
-        y = rand() % 20;
+        x = rand() % 30 + 1;
+        y = rand() % 20 + 1;
 
 		if (count_phase % 5 == 0)
 		{
@@ -221,8 +221,8 @@ public:
 
 	void make_portal()
 	{
-        x = rand() % 30;
-        y = rand() % 20;
+        x = rand() % 30 + 1;
+        y = rand() % 20 + 1;
 	}
 
 	bool is_able(const SNAKE s, const FOOD f, const PORTAL p) const
