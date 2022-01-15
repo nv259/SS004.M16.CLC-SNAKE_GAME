@@ -291,8 +291,69 @@ public:
 	}
 };
 
+class ROCK
+{
+public:
+	int x;
+	int y;
+	
+	void make_rock()
+	{
+        srand(unsigned (time(NULL)));
+        x = rand() % 60 + 1;
+        y = rand() % 20 + 1;
+	}
+
+	bool is_able(const SNAKE s, const FOOD f, const PORTAL p1, const PORTAL p2, const ROCK pre_rock) 
+	{
+		if (x == 0 || x == 60 || y == 1 || y == 22)
+			return false;
+
+		for (int i = 0; i < s.snake_length; i++)
+			if (s.snake[i].x == x && s.snake[i].y == y)
+				return false;
+
+		if (x == f.x && y == f.y)
+			return false;
+
+        if ((x == p2.x && y == p2.y) || (x == p1.x && y == p2.y)) 
+            return false;
+
+        if (x == pre_rock.x && y == pre_rock.y) 
+            return false;
+
+		return true;
+	}
+
+	void init(const SNAKE s, const FOOD f, const PORTAL p1, const PORTAL p2, const ROCK pre_rock)
+	{
+		do
+		{
+			make_rock();
+		}
+		while (!is_able(s, f, p1, p2, pre_rock));
+	}
+
+	void draw() const
+	{
+		gotoxy(static_cast<short>(x), static_cast<short>(y));
+		std::cout << Color(17) << ' ' << Color(7);
+		gotoxy(0, 0);
+	}
+};
+
+int _level;
+ROCK rock[30];
+
 bool game_over(const SNAKE s, std::string& reason)
 {
+    for (int i = 0; i < 3*_level; i++)
+        if (s.snake[0].x == rock[i].x && s.snake[0].y == rock[i].y) 
+        {
+            reason = "Hey bro! I know you're quite hungry, but at least don't eat anything you see, okay?";
+            return true;
+        }
+
 	/* portal cut the snake */
 	if (dead_by_multiuniverse)
 	{
@@ -359,7 +420,6 @@ PORTAL portal1, portal2;
 void game_level()
 {
 	std::string level;
-	int _level;
 	std::cout << "Vui long chon cap do tu 1 --> 5 \nPs: cap do la so nguyen lon hon 0 va be hon 6\n>> ";
 	std::cin >> level;
 	if (level == "862006")
@@ -548,7 +608,9 @@ void draw_score_board(High_score scores[], int len) {
     gotoxy(70, 6);
     std::cout << "3. Portals will be helpful if be used it cleverly!";
     gotoxy(70, 7);
-    std::cout << "4. The longer you are, the more score you'll get.";
+    std::cout << "4. Eat the fruit (red) as much as you can.";
+    gotoxy(70, 8);
+    std::cout << "5. You can't bite a rock (blue), better beware of them.";
 
     std::cout << Color(10);
     gotoxy(90, 10);
@@ -623,6 +685,22 @@ REPLAY:
 
 		snake.init();
 		fruit.init(snake);
+        gotoxy(40, 50);
+        std::string temp = "GENERATING YARD.......";
+        for (char c : temp)
+        {
+            std::cout << c;
+            Sleep(80);
+        }
+        Sleep(300);
+        temp = "DO NOT PRESS X........";
+        for (char c: temp)
+        {
+            std::cout << c;
+            Sleep(80);
+        }
+        for (int i = 0; i < 3*_level; i++)
+            rock[i].init(snake, fruit, portal1, portal2, rock[i-1]);        
 
 		while (!game_over(snake, reason))
 		{
@@ -645,6 +723,9 @@ REPLAY:
 				RESTART: const char opt = _getch();
 				if (opt == 'y' || opt == 'Y')
 				{
+                    std::sort(scores, scores + len, cmp_score);
+                    for (int i = 0; i < len; i++)
+                        output << scores[i].user_name << " " << scores[i].score << "\n"; 
 					cls();
 					goto REPLAY;
 				}
@@ -661,6 +742,7 @@ REPLAY:
 			{
 				if (start)
 				{
+                    gotoxy(15, 30);
 					const std::string welcome = "WELCOME TO SNAKE GAME!";
 					std::cout << "\t\t\t\t\t" << Color(10);
 					for (const char c : welcome)
@@ -669,12 +751,14 @@ REPLAY:
 						Sleep(80);
 					}
 					std::cout << Color(7);
-					Sleep(100);
+					Sleep(500);
 
 					cls();
 					board.draw();
 					snake.draw();
 					fruit.draw();
+                    for (int i = 0; i < 3*_level; i++)
+                        rock[i].draw();
 					gotoxy(0, 24);
 					pressAnyKey(TEXT("Use a | w | d | s to move around, x to pause"));
 					start = false;
@@ -692,15 +776,18 @@ REPLAY:
 			}
 			system("cls");
 			gotoxy(0, 0);
-			std::cout << "Game level: " << game_level;
+			std::cout << "Game level: " << _level;
             std::cout << Color(45);
             for (int i = 10; i < 59 ; i++) std::cout << ' '; 
             std::cout << Color(15) << "\n";
 
 			snake.move(direct);
+
 			snake.draw();
 			board.draw();
 			fruit.draw();
+            for (int i = 0; i < 3*_level; i++)
+                rock[i].draw();
             draw_score_board(scores, len);
 			eat_food(snake, fruit);
 
