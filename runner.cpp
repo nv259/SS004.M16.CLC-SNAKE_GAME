@@ -291,6 +291,55 @@ public:
 	}
 };
 
+class ROCK
+{
+public:
+	int x;
+	int y;
+	
+	void make_rock()
+	{
+        srand(unsigned (time(NULL)));
+        x = rand() % 60 + 1;
+        y = rand() % 20 + 1;
+	}
+
+	bool is_able(const SNAKE s, const FOOD f, const PORTAL p1, const PORTAL p2) 
+	{
+		if (x == 0 || x == 60 || y == 1 || y == 22)
+			return false;
+
+		for (int i = 0; i < s.snake_length; i++)
+			if (s.snake[i].x == x && s.snake[i].y == y)
+				return false;
+
+		if (x == f.x && y == f.y)
+			return false;
+
+        if ((x == p2.x && y == p2.y) || (x == p1.x && y == p2.y)) 
+            return false;
+
+		return true;
+	}
+
+	void init(const SNAKE s, const FOOD f, const PORTAL p1, const PORTAL p2)
+	{
+        if (player_score % 20 == 0)
+		do
+		{
+			make_rock();
+		}
+		while (!is_able(s, f, p1, p2));
+	}
+
+	void draw() const
+	{
+		gotoxy(static_cast<short>(x), static_cast<short>(y));
+		std::cout << Color(25) << ' ' << Color(7);
+		gotoxy(0, 0);
+	}
+};
+
 bool game_over(const SNAKE s, std::string& reason)
 {
 	/* portal cut the snake */
@@ -548,7 +597,9 @@ void draw_score_board(High_score scores[], int len) {
     gotoxy(70, 6);
     std::cout << "3. Portals will be helpful if be used it cleverly!";
     gotoxy(70, 7);
-    std::cout << "4. The longer you are, the more score you'll get.";
+    std::cout << "4. Eat the fruit (red) as much as you can.";
+    gotoxy(70, 8);
+    std::cout << "5. You can't bite a rock (blue), better beware of them.";
 
     std::cout << Color(10);
     gotoxy(90, 10);
@@ -669,7 +720,7 @@ REPLAY:
 						Sleep(80);
 					}
 					std::cout << Color(7);
-					Sleep(100);
+					Sleep(300);
 
 					cls();
 					board.draw();
