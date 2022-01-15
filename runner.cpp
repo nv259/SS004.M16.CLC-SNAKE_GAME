@@ -6,7 +6,7 @@
 
 class Color
 {
-	HANDLE consoleHandle_ = GetStdHandle(STD_OUTPUT_HANDLE);
+	HANDLE console_handle_ = GetStdHandle(STD_OUTPUT_HANDLE);
 	WORD color_;
 public:
 	explicit Color(const WORD code) : color_(code)
@@ -15,7 +15,7 @@ public:
 
 	friend std::ostream& operator <<(std::ostream& ss, const Color& obj)
 	{
-		SetConsoleTextAttribute(obj.consoleHandle_, obj.color_);
+		SetConsoleTextAttribute(obj.console_handle_, obj.color_);
 		return ss;
 	}
 };
@@ -133,9 +133,10 @@ public:
 		{
 			gotoxy(static_cast<short>(snake[i].x), static_cast<short>(snake[i].y));
 			if (i == 0)
-				std::cout << '@';
-			else std::cout << '#';
+				std::cout << Color(225) << ' ';
+			else std::cout << Color(165) << ' ';
 		}
+		std::cout << Color(7);
 	}
 };
 
@@ -211,7 +212,8 @@ public:
 	void draw() const
 	{
 		gotoxy(static_cast<short>(x), static_cast<short>(y));
-		std::cout << Color(240) << ' ' << Color(7);
+		std::cout << Color(195) << ' ' << Color(7);
+		gotoxy(0, 0);
 	}
 };
 
@@ -262,7 +264,9 @@ public:
 	void draw() const
 	{
 		gotoxy(static_cast<short>(x), static_cast<short>(y));
-		std::cout << time_left_for_portal_to_disappear;
+		//std::cout << time_left_for_portal_to_disappear;
+		std::cout << Color(5) << '@' << Color(7);
+		gotoxy(0, 0);
 	}
 };
 
@@ -272,26 +276,22 @@ public:
 	void draw()
 	{
 		gotoxy(0, 1);
-		std::cout << static_cast<char>(218);
-		for (int i = 1; i < 31; i++)
-			std::cout << static_cast<char>(196);
-		std::cout << static_cast<char>(191) << '\n';
+		for (int i = 0; i <= 31; i++)
+			std::cout << Color(225) << ' ';
+		std::cout << '\n';
 
-		for (int row = 1; row < 21; row++)
+		for (int row = 1; row <= 21; row++)
 		{
-			for (int col = 1; col < 33; col++)
-			{
-				if (col == 1 || col == 32)
-					std::cout << static_cast<char>(179);
-				else std::cout << " ";
-			}
-			std::cout << '\n';
+			gotoxy(0, row);
+			std::cout << Color(225) << ' ';
+
+			gotoxy(31, row);
+			std::cout << Color(225) << ' ';
 		}
 
-		std::cout << static_cast<char>(192);
-		for (int i = 1; i < 31; i++)
-			std::cout << static_cast<char>(196);
-		std::cout << static_cast<char>(217);
+		gotoxy(0, 22);
+		for (int i = 0; i <= 31; i++)
+			std::cout << Color(225) << ' ';
 	}
 };
 
@@ -364,7 +364,7 @@ void game_level()
 {
 	std::string level;
 	int _level;
-	std::cout << "Vui long chon cap do tu 1 --> 5 \nPs: cap do la so nguyen lon hon 0 va be hon 6 \n";
+	std::cout << "Vui long chon cap do tu 1 --> 5 \nPs: cap do la so nguyen lon hon 0 va be hon 6\n>> ";
 	std::cin >> level;
 	if (level == "862006")
 	{
@@ -382,7 +382,7 @@ void game_level()
 				if (level.size() == 1)
 					if (level[0] == '1' || level[0] == '2' || level[0] == '3' || level[0] == '4' || level[0] == '5')
 						break;
-				std::cout << "Vui long nhap so tu 1-->5 \n";
+				std::cout << "Vui long nhap so tu 1-->5\n>> ";
 				std::cin >> level;
 			}
 			_level = level[0] - '0';
@@ -549,9 +549,20 @@ REPLAY:
 
 			if (direct == 'x')
 			{
-				gotoxy(0, 24);
 				if (start)
 				{
+
+					const std::string welcome = "WELCOME TO SNAKE GAME!";
+					std::cout << "\t\t\t\t\t" << Color(10);
+					for (const char c : welcome)
+					{
+						std::cout << c;
+						Sleep(80);
+					}
+					std::cout << Color(7);
+					Sleep(100);
+
+					cls();
 					board.draw();
 					snake.draw();
 					fruit.draw();
@@ -560,32 +571,40 @@ REPLAY:
 					start = false;
 					cls();
 				}
-				else pressAnyKey();
+				else
+				{
+					gotoxy(0, 24);
+					pressAnyKey();
+				}
 				direct = pre_direct;
 				gotoxy(0, 24);
 				std::cout << "                                            ";
 				continue;
 			}
+			system("cls");
 			gotoxy(0, 0);
 			std::cout << "Score: " << player_score << '\n';
 
-			board.draw();
-			if (time_left_for_portal_to_disappear > 0 && !go_to_portal(portal1, portal2))
-				go_to_portal(portal2, portal1);
-
 			snake.move(direct);
 			snake.draw();
+			board.draw();
 			fruit.draw();
 			eat_food(snake, fruit);
 
+			if (time_left_for_portal_to_disappear > 0 && !go_to_portal(portal1, portal2))
+				go_to_portal(portal2, portal1);
+
 			time_left_for_portal_to_disappear--;
+
 			if (time_left_for_portal_to_disappear <= 0)
 				portal_is_opening = false;
+
 			if (time_left_for_portal_to_disappear > 0)
 			{
 				portal1.draw();
 				portal2.draw();
 			}
+
 			if (!portal_is_opening)
 				try_make_portal();
 			Sleep(100);
