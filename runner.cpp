@@ -736,17 +736,16 @@ int main()
 
     std::ofstream output("best_score.txt");
     //PlaySound(L"theme.wav", NULL, SND_ASYNC);
-    PlaySound(TEXT("START_GAME.wav"),NULL, SND_FILENAME | SND_LOOP | SND_ASYNC);
 	//PlaySound(TEXT(L"theme.wav"), GetModuleHandle(NULL), SND_FILENAME | SND_ASYNC);
 	//sndPlaySound(TEXT("theme.wav"), SND_FILENAME | SND_ASYNC | SND_LOOP);
     bool start = true;
 REPLAY:
 	{
-	    //PlaySound(TEXT("NONE.wav"),NULL, SND_FILENAME | SND_LOOP | SND_ASYNC);
+
         std::sort(scores, scores + len, cmp_score);
         for (int i = 0; i < len; i++)
             output << scores[i].user_name << " " << scores[i].score << "\n";
-
+        PlaySound(TEXT("START_GAME.wav"),NULL, SND_FILENAME | SND_LOOP | SND_ASYNC);
 		restart();
 		game_level();
 		cls();
@@ -777,7 +776,7 @@ REPLAY:
 			{
 				pre_direct = direct;
 				direct = _getch();
-
+                PlaySound(TEXT("NONE.wav"),NULL, SND_FILENAME | SND_LOOP | SND_ASYNC);
 				if (!available_key.find(direct))
 					direct = pre_direct;
 
@@ -815,6 +814,7 @@ REPLAY:
 						std::cout << c;
 						Sleep(80);
 					}
+
 					std::cout << Color(7);
 					Sleep(100);
 
@@ -885,7 +885,7 @@ REPLAY:
 		gotoxy(0, 24);
 		std::cout << reason << '\n';
 	}
-
+     PlaySound(TEXT("END_GAME.wav"),NULL, SND_FILENAME | SND_LOOP | SND_ASYNC);
     if (player_score > scores[5].score)
     {
         std::string name;
@@ -897,7 +897,7 @@ REPLAY:
     std::sort(scores, scores + len, cmp_score);
     for (int i = 0; i < len; i++)
         output << scores[i].user_name << " " << scores[i].score << "\n";
-    PlaySound(TEXT("END_GAME.wav"),NULL, SND_FILENAME | SND_LOOP | SND_ASYNC);
+
 	std::cout << "Press 'r' to replay or 'Esc' to exit...";
 
 NHAPLAI: const char option = _getch();
