@@ -12,3 +12,5 @@
 - Trello nhóm:
 - https://trello.com/invite/b/N8J5ccaW/9c509a0a905488bccdf545c22798ce1b/project-management
 
+# LƯU Ý:
+- thực hiện link "winmm" vào codeblock để có thể phát âm thanh.
