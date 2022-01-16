@@ -1,0 +1,5 @@
+thank 5
+you 4
+for 3
+play 2
+our-game! 1
