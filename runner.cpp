@@ -8,6 +8,8 @@
 #include <fstream>
 #include <map>
 #include <algorithm>
+#include <stdio.h>
+#include <mmsystem.h>
 
 class Color
 {
@@ -334,14 +336,12 @@ bool game_over(const SNAKE s, std::string& reason)
 	/* snake bite itself */
 	for (int i = 1; i < s.snake_length; i++)
 		if (s.snake[0].x == s.snake[i].x && s.snake[0].y == s.snake[i].y)
-		{
+        {
 			reason = "You bit yourself off! Game over!";
 			return true;
 		}
-
 	return false;
 }
-
 void delete_fruit(FOOD f) {
     gotoxy(static_cast<short>(f.x), static_cast<short>(f.y));
     std::cout << Color(0) << " ";
@@ -361,6 +361,7 @@ void eat_food(SNAKE& s, FOOD& fruit)
 {
     if ((abs(s.snake[0].x - fruit.x) <= 1) && s.snake[0].y == fruit.y)
 	{
+        PlaySound(TEXT("EATING.wav"),NULL, SND_FILENAME | SND_ASYNC);
 		s.snake[s.snake_length].x = s.snake[s.snake_length - 1].x;
 		s.snake[s.snake_length].y = s.snake[s.snake_length - 1].y;
 		s.snake_length++;
@@ -400,11 +401,12 @@ SNAKE snake;
 FOOD fruit;
 BOARD board;
 PORTAL portal1, portal2;
+int _level;
 
 void game_level()
 {
 	std::string level;
-	int _level;
+
 	std::cout << "Vui long chon cap do tu 1 --> 5 \nPs: cap do la so nguyen lon hon 0 va be hon 6\n>> ";
 	std::cin >> level;
 	if (level == "862006")
@@ -733,12 +735,14 @@ int main()
     }
 
     std::ofstream output("best_score.txt");
-
-	PlaySound(TEXT("snake-game-theme.wav"), GetModuleHandle(NULL), SND_FILENAME | SND_ASYNC);
-	//sndPlaySound(TEXT("snake-game-theme.wav"), SND_FILENAME | SND_ASYNC | SND_LOOP);
-
+    //PlaySound(L"theme.wav", NULL, SND_ASYNC);
+    PlaySound(TEXT("START_GAME.wav"),NULL, SND_FILENAME | SND_LOOP | SND_ASYNC);
+	//PlaySound(TEXT(L"theme.wav"), GetModuleHandle(NULL), SND_FILENAME | SND_ASYNC);
+	//sndPlaySound(TEXT("theme.wav"), SND_FILENAME | SND_ASYNC | SND_LOOP);
+    bool start = true;
 REPLAY:
 	{
+	    //PlaySound(TEXT("NONE.wav"),NULL, SND_FILENAME | SND_LOOP | SND_ASYNC);
         std::sort(scores, scores + len, cmp_score);
         for (int i = 0; i < len; i++)
             output << scores[i].user_name << " " << scores[i].score << "\n";
@@ -759,7 +763,6 @@ REPLAY:
 		}
 		// Nh?p sai cheatcode
 
-		bool start = true;
 		char direct = 'x';
 		char pre_direct = 'a';
 		std::string reason;
@@ -835,7 +838,7 @@ REPLAY:
 			}
 			// cls();
 			gotoxy(0, 0);
-			std::cout << "GAME LEVEL: " << game_level;
+			std::cout << Color(240) << "GAME LEVEL: " << _level;
             std::cout << Color(45);
             for (int i = 10; i < 79 ; i++) std::cout << ' ';
 			snake.move(direct);
@@ -894,7 +897,7 @@ REPLAY:
     std::sort(scores, scores + len, cmp_score);
     for (int i = 0; i < len; i++)
         output << scores[i].user_name << " " << scores[i].score << "\n";
-
+    PlaySound(TEXT("END_GAME.wav"),NULL, SND_FILENAME | SND_LOOP | SND_ASYNC);
 	std::cout << "Press 'r' to replay or 'Esc' to exit...";
 
 NHAPLAI: const char option = _getch();
